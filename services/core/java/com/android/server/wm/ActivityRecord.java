@@ -294,6 +294,7 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.Trace;
 import android.os.UserHandle;
+import android.os.UserManager;
 import android.service.contentcapture.ActivityEvent;
 import android.service.dreams.DreamActivity;
 import android.service.voice.IVoiceInteractionSession;
@@ -9329,6 +9330,11 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
 
     @Override
     boolean showToCurrentUser() {
+        UserManager um = UserManager.get(mAtmService.mContext);
+        if(!um.isUserUnlocked(mUserId)
+                && !info.applicationInfo.isEncryptionAware()) {
+            return false;
+        }
         return mShowForAllUsers || mWmService.isCurrentProfile(mUserId);
     }
 
