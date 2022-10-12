@@ -420,7 +420,7 @@ public final class CachedAppOptimizer {
     private void setAppCompactProperties() {
         boolean useCompaction =
                     Boolean.valueOf(mPerf.perfGetProp("vendor.appcompact.enable_app_compact",
-                        "false"));
+                        "true"));
         int threadPriority =
                     Integer.valueOf(mPerf.perfGetProp("vendor.appcompact.thread_priority",
                         String.valueOf(Process.THREAD_GROUP_BACKGROUND)));
