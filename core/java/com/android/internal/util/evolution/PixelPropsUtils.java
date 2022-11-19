@@ -32,6 +32,7 @@ import java.util.Map;
 public class PixelPropsUtils {
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_FINSKY = "com.android.vending";
+    private static final String PACKAGE_NETFLIX = "com.netflix.mediaclient";
     private static final String PACKAGE_SETTINGS_SERVICES = "com.google.android.settings.intelligence";
     private static final String PACKAGE_WALLPAPERS = "com.google.android.apps.wallpaper";
     private static final String SAMSUNG = "com.samsung.android.";
@@ -61,6 +62,7 @@ public class PixelPropsUtils {
     };
 
     private static final String[] extraPackagesToChange = {
+            PACKAGE_NETFLIX,
             "com.android.chrome",
             "com.breel.wallpapers20",
             "com.nhs.online.nhsonline"
@@ -218,11 +220,16 @@ public class PixelPropsUtils {
         if (packageName == null || packageName.isEmpty() || (Arrays.asList(packagesToKeep).contains(packageName)) || isPixelDevice) {
             return;
         }
+        if (packageName.equals(PACKAGE_NETFLIX) && !SystemProperties.getBoolean(
+                "persist.sys.spoof_netflix", false)) {
+            if (DEBUG) Log.d(TAG, "Netflix spoofing disabled by system prop");
+            return;
+        }
         if (packageName.startsWith("com.google.")
                 || packageName.startsWith(SAMSUNG)
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
             if (packageName.equals("com.google.android.apps.photos")) {
-                if (SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
+                if (SystemProperties.getBoolean("persist.sys.spoof_gphotos", true)) {
                     propsToChange.putAll(propsToChangePixelXL);
                 } else {
                     propsToChange.putAll(propsToChangePixel5);
@@ -265,7 +272,7 @@ public class PixelPropsUtils {
                     setPropValue(key, value);
                 }
             }
-            if (!SystemProperties.getBoolean("persist.sys.pixelprops.games", false))
+            if (!SystemProperties.getBoolean("persist.sys.spoof_games", false))
                 return;
             if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
                 if (DEBUG)
