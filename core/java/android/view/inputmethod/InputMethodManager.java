@@ -62,6 +62,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.IPowerManager;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
@@ -657,6 +658,14 @@ public final class InputMethodManager {
             ImeTracing.getInstance().triggerClientDump(
                     "InputMethodManager.DelegateImpl#startInput", InputMethodManager.this,
                     null /* icProto */);
+            
+    	    IPowerManager pm =
+                IPowerManager.Stub.asInterface(ServiceManager.getService(Context.POWER_SERVICE));
+            try {
+              pm.setPowerBoost(0, 2000);
+            } catch (RemoteException e) {
+              throw e.rethrowFromSystemServer();
+            }
             synchronized (mH) {
                 mCurrentTextBoxAttribute = null;
                 mCompletions = null;

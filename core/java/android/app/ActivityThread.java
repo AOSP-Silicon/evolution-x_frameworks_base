@@ -121,6 +121,7 @@ import android.os.Handler;
 import android.os.HandlerExecutor;
 import android.os.IBinder;
 import android.os.ICancellationSignal;
+import android.os.IPowerManager;
 import android.os.LocaleList;
 import android.os.Looper;
 import android.os.Message;
@@ -6449,6 +6450,9 @@ public final class ActivityThread extends ClientTransactionHandler
 
     @UnsupportedAppUsage
     private void handleBindApplication(AppBindData data) {
+        long st_bindApp = SystemClock.uptimeMillis();
+        IPowerManager pm =
+                IPowerManager.Stub.asInterface(ServiceManager.getService(Context.POWER_SERVICE));
         // Register the UI Thread as a sensitive thread to the runtime.
         VMRuntime.registerSensitiveThread();
         // In the case the stack depth property exists, pass it down to the runtime.
@@ -6676,6 +6680,18 @@ public final class ActivityThread extends ClientTransactionHandler
         }
 
         if (!Process.isIsolated()) {
+            final int old_mask = StrictMode.allowThreadDiskWritesMask();
+            try {
+                pm.setPowerBoost(0, 2000);
+    	    } catch (RemoteException e) {
+    	         throw e.rethrowFromSystemServer();
+            } finally {
+                 StrictMode.setThreadPolicyMask(old_mask);
+            }
+        }
+
+
+        if (!Process.isIsolated()) {
             final int oldMask = StrictMode.allowThreadDiskWritesMask();
             try {
                 setupGraphicsSupport(appContext);
@@ -6801,6 +6817,19 @@ public final class ActivityThread extends ClientTransactionHandler
                 throw e.rethrowFromSystemServer();
             }
         }
+        long end_bindApp = SystemClock.uptimeMillis();
+        int bindApp_dur = (int) (end_bindApp - st_bindApp);
+        String pkg_name = null;
+        if (appContext != null) {
+            pkg_name = appContext.getPackageName();
+        }
+        if (!Process.isIsolated() && pkg_name != null) {
+    	   try {
+    	      pm.setPowerBoost(0, bindApp_dur);
+    	  } catch (RemoteException e) {
+    	     throw e.rethrowFromSystemServer();
+    	  }
+        } 
     }
 
     private void handleSetContentCaptureOptionsCallback(String packageName) {
