@@ -807,6 +807,13 @@ public class ApplicationPackageManager extends PackageManager {
                 }
             };
 
+    private static final String[] p21Codenames = {
+            "cheetah",
+            "panther",
+            "oriole",
+            "raven"
+    };
+
     private static final String[] featuresPixel = {
             "com.google.android.apps.photos.PIXEL_2019_PRELOAD",
             "com.google.android.apps.photos.PIXEL_2019_MIDYEAR_PRELOAD",
@@ -841,12 +848,16 @@ public class ApplicationPackageManager extends PackageManager {
     @Override
     public boolean hasSystemFeature(String name, int version) {
         String packageName = ActivityThread.currentPackageName();
+        boolean isP21Device = Arrays.asList(p21Codenames).contains(SystemProperties.get(DEVICE));
         if (packageName != null &&
                 packageName.equals("com.google.android.apps.photos") &&
                 SystemProperties.getBoolean("persist.sys.spoof_gphotos", true)) {
             if (Arrays.asList(featuresPixel).contains(name)) return false;
             if (Arrays.asList(featuresP21).contains(name)) return false;
             if (Arrays.asList(featuresNexus).contains(name)) return true;
+        }
+        if (isP21Device) {
+            if (Arrays.asList(featuresP21).contains(name)) return true;
         }
         if (Arrays.asList(featuresPixel).contains(name)) return true;
         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
