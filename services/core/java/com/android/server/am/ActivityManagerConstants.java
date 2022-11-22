@@ -147,7 +147,7 @@ final class ActivityManagerConstants extends ContentObserver {
      */
     static final String KEY_NETWORK_ACCESS_TIMEOUT_MS = "network_access_timeout_ms";
 
-    private static int DEFAULT_MAX_CACHED_PROCESSES = 48;
+    private static int DEFAULT_MAX_CACHED_PROCESSES = 64;
     private static final long DEFAULT_FGSERVICE_MIN_SHOWN_TIME = 2*1000;
     private static final long DEFAULT_FGSERVICE_MIN_REPORT_TIME = 3*1000;
     private static final long DEFAULT_FGSERVICE_SCREEN_ON_BEFORE_TIME = 1*1000;
@@ -1078,7 +1078,7 @@ final class ActivityManagerConstants extends ContentObserver {
     private void updatePerfConfigConstants() {
           // Maximum number of cached processes we will allow.
             DEFAULT_MAX_CACHED_PROCESSES = MAX_CACHED_PROCESSES = CUR_MAX_CACHED_PROCESSES = Integer.valueOf(
-                                                 SystemProperties.get("persist.sys.fw.bg_apps_limit", "48"));
+                                                 SystemProperties.get("persist.sys.fw.bg_apps_limit", "64"));
 
             //Trim Settings
             USE_TRIM_SETTINGS = Boolean.parseBoolean(SystemProperties.get("persist.sys.fw.use_trim_settings", "true"));
